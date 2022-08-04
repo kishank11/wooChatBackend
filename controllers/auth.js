@@ -37,9 +37,7 @@ const verifyotp = async (req, res) => {
   try {
     const data = await Otp.findOne({ phone: req.body.phone });
     if ((data.code = req.body.otp)) {
-      const user = await User.create({ phone: req.body.phone });
-
-      return res.json(user);
+      return res.json(data);
     } else {
       res.json({ msg: "otp incorrect" });
     }
