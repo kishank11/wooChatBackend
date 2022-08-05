@@ -7,8 +7,10 @@ const User = require("../models/User");
 
 const register = async (req, res, next) => {
   try {
-    let otpcode = Math.floor(100000 + Math.random() * 900000);
-
+    //generating otp
+    let otpcode = Math.floor(100000 + Math.random() * 900000); 
+ 
+    //sending otp
     await client.messages
       .create({
         body: `${otpcode}`,
@@ -23,6 +25,7 @@ const register = async (req, res, next) => {
           code: otpcode,
           expireIn: new Date().getTime() + 400000 * 1000,
         });
+        //saving otp in db
         const otpdata = await otpData.save();
       })
       .catch((err) => {
@@ -36,9 +39,11 @@ const register = async (req, res, next) => {
 const verifyotp = async (req, res) => {
   try {
     const data = await Otp.findOne({ phone: req.body.phone });
+    //if otp match
     if ((data.code = req.body.otp)) {
       return res.json(data);
     } else {
+      //when otp didnt match
       res.json({ msg: "otp incorrect" });
     }
   } catch (error) {
@@ -48,6 +53,7 @@ const verifyotp = async (req, res) => {
 
 const check = async (req, res) => {
   try {
+    //searching if user exists
     const user = await User.findOne({
       phone: req.body.phone,
     });
@@ -55,6 +61,7 @@ const check = async (req, res) => {
     if (user)
       return res.status(400).json({ msg: "This phone already exists." });
     else {
+      //create new user
       const result = await User.create({ phone: req.body.phone });
       return res.json(result);
     }
