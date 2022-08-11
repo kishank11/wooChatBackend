@@ -8,8 +8,8 @@ const User = require("../models/User");
 const register = async (req, res, next) => {
   try {
     //generating otp
-    let otpcode = Math.floor(100000 + Math.random() * 900000); 
- 
+    let otpcode = Math.floor(100000 + Math.random() * 900000);
+
     //sending otp
     await client.messages
       .create({
@@ -41,7 +41,8 @@ const verifyotp = async (req, res) => {
     const data = await Otp.findOne({ phone: req.body.phone });
     //if otp match
     if ((data.code = req.body.otp)) {
-      return res.json(data);
+      const result = jwt.sign({ phone: req.body.phone }, process.env.JWT_SEC);
+      return res.json({ data, result });
     } else {
       //when otp didnt match
       res.json({ msg: "otp incorrect" });
@@ -58,8 +59,7 @@ const check = async (req, res) => {
       phone: req.body.phone,
     });
     console.log(user);
-    if (user)
-      return res.status(400).json({ msg: "This phone already exists." });
+    if (user) return res.status(400).json(user);
     else {
       //create new user
       const result = await User.create({ phone: req.body.phone });
